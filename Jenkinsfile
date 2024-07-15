@@ -11,6 +11,7 @@ pipeline {
         sh 'echo passed'
         // Uncomment the following line to enable the git checkout
         // git branch: 'main', url: 'https://github.com/iam-veeramalla/Jenkins-Zero-To-Hero.git'
+        git branch: 'main', credentialsId: 'git-cred', url: 'https://github.com/DILSHAN565/Try_build.git'
       }
     }
     stage('Build and Test') {
