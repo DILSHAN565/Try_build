@@ -73,14 +73,14 @@ pipeline {
         }
         */
 
-        stage('Build the Docker Image') {
-            steps {
-                script {
-                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                        sh 'docker build -t thilanka998/Boardgame:v1 .'
-                    }
-                }
-            }
-        }
+        // stage('Build the Docker Image') {
+        //     steps {
+        //         script {
+        //             withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+        //                 sh 'docker build -t thilanka998/Boardgame:v1 .'
+        //             }
+        //         }
+        //     }
+        // }
     }
 }
