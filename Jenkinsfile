@@ -1,4 +1,3 @@
-
 pipeline {
     agent {
         docker {
@@ -8,16 +7,10 @@ pipeline {
         }
     }
 
-
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
     }
 
-
-
-
-
-    
     stages {
         stage('Git Checkout') {
             steps {
@@ -37,78 +30,57 @@ pipeline {
             }
         }
 
-
-        
-
         stage('File System Scan') {
             steps {
                 sh 'trivy fs --format table -o trivy-fs-report.html .'
             }
         }
 
-
-        /*stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('sonar') {
-                    sh ''' 
-                    $SCANNER_HOME/bin/sonar-scanner \
-                        -Dsonar.projectName=Build_test \
-                        -Dsonar.projectKey=Build_test \
-                        -Dsonar.java.binaries=. 
-                    '''
-                }
-            }
-        }
+        // stage('SonarQube Analysis') {
+        //     steps {
+        //         withSonarQubeEnv('sonar') {
+        //             sh ''' 
+        //             $SCANNER_HOME/bin/sonar-scanner \
+        //                 -Dsonar.projectName=Build_test \
+        //                 -Dsonar.projectKey=Build_test \
+        //                 -Dsonar.java.binaries=. 
+        //             '''
+        //         }
+        //     }
+        // }
         
-        stage('Quality Gate') {
-            steps {
-                script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token' 
-                }
-            }
-        }
+        // stage('Quality Gate') {
+        //     steps {
+        //         script {
+        //             waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token' 
+        //         }
+        //     }
+        // }
 
-        */
-
-
-
-
-        
-        
         stage('Build') {
             steps {
                 sh 'mvn package'
             }
         }
 
-
-        // stage('Publish to Nexus') {
-        //     steps {
-        //         withMaven(globalMavenSettingsConfig: 'global-settings', jdk: 'jdk17', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
-        //         sh 'mvn deploy'
-        //           }
-        //     }
-        // }
-
-
-        stage('Build teh docker Image') {
+        /* Uncomment and configure this stage if you need to publish to Nexus
+        stage('Publish to Nexus') {
             steps {
-                script(
-                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                        sh 'docker build -t thilanka998/Boardgame:v1 .'
-    
-                       }
-                )
+                withMaven(globalMavenSettingsConfig: 'global-settings', jdk: 'jdk17', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
+                    sh 'mvn deploy'
+                }
             }
         }
+        */
 
-        
-
-
-        
-
-
-
-        
+        stage('Build the Docker Image') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh 'docker build -t thilanka998/Boardgame:v1 .'
+                    }
+                }
+            }
+        }
     }
 }
