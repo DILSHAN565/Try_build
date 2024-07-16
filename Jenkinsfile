@@ -7,6 +7,17 @@ pipeline {
             args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // Mount Docker socket to access the host's Docker daemon
         }
     }
+
+
+    environment {
+        SCANNER_HOME = tool 'sonar-scanner'
+    }
+
+
+
+
+
+    
     stages {
         stage('Git Checkout') {
             steps {
@@ -34,6 +45,33 @@ pipeline {
                 sh 'trivy fs --format table -o trivy-fs-report.html .'
             }
         }
+
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('sonar') {
+                    sh ''' 
+                    $SCANNER_HOME/bin/sonar-scanner \
+                        -Dsonar.projectName=Build_test \
+                        -Dsonar.projectKey=Build_test \
+                        -Dsonar.java.binaries=. 
+                    '''
+                }
+            }
+        }
+        
+        stage('Quality Gate') {
+            steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token' 
+                }
+            }
+        }
+
+
+
+
+        
         
         stage('Package') {
             steps {
