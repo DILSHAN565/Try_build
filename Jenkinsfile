@@ -24,6 +24,12 @@ pipeline {
                 sh 'mvn test'
             }
         }
+
+        stage('File System Scan') {
+            steps {
+                sh 'trivy fs --format table -o trivy-fs-report.html .'
+            }
+        }
         
         stage('Package') {
             steps {
