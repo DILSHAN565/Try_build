@@ -82,13 +82,27 @@ pipeline {
         }
 
 
-        stage('Publish to Nexus') {
+        // stage('Publish to Nexus') {
+        //     steps {
+        //         withMaven(globalMavenSettingsConfig: 'global-settings', jdk: 'jdk17', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
+        //         sh 'mvn deploy'
+        //           }
+        //     }
+        // }
+
+
+        stage('Build teh docker Image') {
             steps {
-                withMaven(globalMavenSettingsConfig: 'global-settings', jdk: 'jdk17', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
-                sh 'mvn deploy'
-                  }
+                script(
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh 'docker build -t thilanka998/Boardgame:v1 .'
+    
+                       }
+                )
             }
         }
+
+        
 
 
         
